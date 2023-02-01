@@ -3,20 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ChirpController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        //
-        return Inertia::render('Hello, World!');
+        return Inertia::render('Chirps/Index', []);
     }
 
     /**
@@ -32,18 +35,24 @@ class ChirpController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @return Application|RedirectResponse|Redirector
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'message' => 'required|string|max:225',
+        ]);
+
+        $request->user()->chirps()->create($validated);
+
+        return redirect(route('chirps.index'));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Chirp  $chirp
+     * @param \App\Models\Chirp $chirp
      * @return \Illuminate\Http\Response
      */
     public function show(Chirp $chirp)
@@ -54,7 +63,7 @@ class ChirpController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Chirp  $chirp
+     * @param \App\Models\Chirp $chirp
      * @return \Illuminate\Http\Response
      */
     public function edit(Chirp $chirp)
@@ -65,8 +74,8 @@ class ChirpController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Chirp  $chirp
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Chirp $chirp
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Chirp $chirp)
@@ -77,7 +86,7 @@ class ChirpController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Chirp  $chirp
+     * @param \App\Models\Chirp $chirp
      * @return \Illuminate\Http\Response
      */
     public function destroy(Chirp $chirp)
